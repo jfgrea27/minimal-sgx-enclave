@@ -1,0 +1,9 @@
+enclave {
+    trusted {
+        public int enclave_add(int a, int b);
+    };
+
+    untrusted {
+        void host_print([in, string] const char* str);
+    };
+};
