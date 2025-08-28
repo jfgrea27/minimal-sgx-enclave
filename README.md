@@ -8,16 +8,28 @@ The application is small and is developed for exploration of SGX internals inclu
 - [Assembly calls](#assembly-calls);
 - [Remote Attestation](#remote-attestation).
 
-## Building
+## Demo
 
-It is assumed that you have the right hardware for running SGX and followed the instructions to setup [Intel SGX SDK & PWK](https://github.com/intel/linux-sgx/tree/main/README.md).
+### Setup
+
+It is assumed that you have the right hardware for running SGX and have installed `Intel SGX SDK` and `Intel SGX PSW`. [This external resource](https://codentium.com/setting-up-intel-sgx/) may be useful.
+
+### Running
 
 ```sh
 # build the app
 make
 ## run the app
 ./app
+
+## SAMPLE INTERACTION
+# Enter the first number: 23
+# Enter the second number: 434
+# [Host RECEIVED MESSAGE FROM ENCLAVE:] Hello from enclave
+# Result from enclave: 457
 ```
+
+As you can see this application asks you for two numbers, calls `enclave_add` to calculate their sum inside the enclave and return the value back to non-enclave part of the program.
 
 ## Exploration
 
@@ -42,8 +54,17 @@ Lastly, the [Enclave.config.xml](./Enclave/Enclave.config.xml) file is used to d
 
 ### Assembly calls
 
-TODO
+When you build the application, you will notice two `.so` files are created: `enclave.so` and `enclave.signed.so`. These files represent the library that is included into the running application at runtime. We will dive deeper into the SGX-specific CPU instructions that are used to initialise and interact with the enclave.
+
+In this repo, we have added [enclave.asm](./enclave.asm) and [enclave.signed.asm](enclave.signed.asm) that are `objdump -d` of the `.so` files mentioned above.
+
+To explore what is going on here, we must first determine the instruction set for the given machine.
+
+Let's explore them:
+
+```sh
+# searching for SGX-specific CPU instructions
+grep -Ei 'encls|enclu|eenter|eexit|eresume|egetkey|ereport' $FILE
+```
 
 ### Remote Attestation
-
-TODO
