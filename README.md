@@ -4,9 +4,7 @@ This project is a minimal SGX Enclave, based on [linux-sgx/SampleCode](https://g
 
 The application is small and is developed for exploration of SGX internals including:
 
-- [Basic Enclave ergonomics](#sgx-ergonomics);
-- [Assembly calls](#assembly-calls);
-- [Remote Attestation](#remote-attestation).
+- [Basic Enclave ergonomics](#sgx-ergonomics).
 
 ## Demo
 
@@ -51,20 +49,3 @@ Please refer to the [documentation](https://cdrdv2-public.intel.com/671446/input
 Further, the [Enclave.lds](./Enclave/Enclave.lds) file instructs how the enclave object files should be linked. In this case, we haven't changed it, and is basically what is defined in [linux-sgx/SampleCode/SampleEnclave](https://github.com/intel/linux-sgx/tree/main/SampleCode/SampleEnclave).
 
 Lastly, the [Enclave.config.xml](./Enclave/Enclave.config.xml) file is used to define enclave configuration parameters, which are used during the signing of the enclave. This ensure the authenticity of the enclave. This file instructs `sgx_sign` (used to sign and validate the integrity and authenticity of the enclave) what metadata is associated with the enclave.
-
-### Assembly calls
-
-When you build the application, you will notice two `.so` files are created: `enclave.so` and `enclave.signed.so`. These files represent the library that is included into the running application at runtime. We will dive deeper into the SGX-specific CPU instructions that are used to initialise and interact with the enclave.
-
-In this repo, we have added [enclave.asm](./enclave.asm) and [enclave.signed.asm](enclave.signed.asm) that are `objdump -d` of the `.so` files mentioned above.
-
-To explore what is going on here, we must first determine the instruction set for the given machine.
-
-Let's explore them:
-
-```sh
-# searching for SGX-specific CPU instructions
-grep -Ei 'encls|enclu|eenter|eexit|eresume|egetkey|ereport' $FILE
-```
-
-### Remote Attestation
