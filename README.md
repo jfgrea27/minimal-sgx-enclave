@@ -2,9 +2,10 @@
 
 This project is a minimal SGX Enclave, based on [linux-sgx/SampleCode](https://github.com/intel/linux-sgx/tree/main/SampleCode).
 
-The application is small and is developed for exploration of SGX internals including:
+The application is small and is developed for exploration of SGX. This document includes:
 
 - [Basic Enclave ergonomics](#sgx-ergonomics).
+- [Remote Attestation](#remote-attestation).
 
 ## Demo
 
@@ -49,3 +50,21 @@ Please refer to the [documentation](https://cdrdv2-public.intel.com/671446/input
 Further, the [Enclave.lds](./Enclave/Enclave.lds) file instructs how the enclave object files should be linked. In this case, we haven't changed it, and is basically what is defined in [linux-sgx/SampleCode/SampleEnclave](https://github.com/intel/linux-sgx/tree/main/SampleCode/SampleEnclave).
 
 Lastly, the [Enclave.config.xml](./Enclave/Enclave.config.xml) file is used to define enclave configuration parameters, which are used during the signing of the enclave. This ensure the authenticity of the enclave. This file instructs `sgx_sign` (used to sign and validate the integrity and authenticity of the enclave) what metadata is associated with the enclave.
+
+## Remote Attestation
+
+Although not part of the scope of this project, here are some notes on remote attestation in SGX.
+
+Remote attestation is a process that allows a *remote party* to verify tha ta program is running *inside a genuine TEE*. Since host OS or cloud provider cannot be fully trusted, remote attestation provides a mechanism to trust enclave without having *physical access*. 
+
+At a high level, RA includes the following: 
+
+1. Enclave creates a report with `MRENCLAVE`, a cryptographic measurement of the enclave code and data at initialisation. This enables the identification of the enclave.
+2. Host generatesa quote that includes the measurements from the enclave. 
+3. Host sends the quotes to a *Quoting Enclave (QE)*, a pre-installed enclave, which signs the quote, producing a final *SGX quote*.
+4. The Host sends the signed SGX quote to a remote verified (e.g. Intel Attestation Service), which verifies the signature and genuiness of the enclave.
+5. The enclave is now proven to be trusted. 
+
+Notes:
+- The key signed by QE is hardwarebacked and tamper-proof, meaning that the authenticity of the quote is ensured. 
+- QE is shipped as part of the SGX PSW. 
